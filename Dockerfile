@@ -1,4 +1,4 @@
-FROM kkarczmarczyk/node-yarn:7.6
+FROM kkarczmarczyk/node-yarn:8.4.0
 
 ENV S3_TMP /tmp/s3cmd.zip
 ENV S3_ZIP /tmp/s3cmd-master
