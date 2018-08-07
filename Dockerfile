@@ -1,4 +1,4 @@
-FROM node:8.4.0
+FROM node:10.8.0
 
 ENV S3_TMP /tmp/s3cmd.zip
 ENV S3_ZIP /tmp/s3cmd-master
@@ -12,25 +12,29 @@ ENV PAGER more
 WORKDIR /tmp
 
 #============================================
-# Google Chrome
+# Google Chrome to run the e2e tests
 #============================================
-ARG CHROME_VERSION="google-chrome-stable"
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-  && apt-get update -qqy \
-  && apt-get -qqy install \
-    ${CHROME_VERSION:-google-chrome-stable} \
-  && rm /etc/apt/sources.list.d/google-chrome.list \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+  echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
+  apt-get update && \
+  apt-get install -y google-chrome-stable=68.0.3440.84-1 && \
+  rm -rf /var/lib/apt/lists/*
 
 #============================================
-# Other dependencies
+# Netcat to wait on the server to go online
+# for the e2e tests
 #============================================
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -V -y \
+  netcat=1.10-41 \
+  && rm -rf /var/lib/apt/lists/*
+
+#============================================
+# Python and Netcat for aws pushes
+#============================================
+RUN apt-get update && apt-get install -V -y \
   python \
-  python-pip \
+  python-pip=1.5.6-5 \
   python-dev \
-  netcat \
   && rm -rf /var/lib/apt/lists/*
 
 RUN pip install awscli
